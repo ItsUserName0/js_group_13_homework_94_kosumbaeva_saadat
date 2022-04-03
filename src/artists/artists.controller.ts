@@ -27,14 +27,15 @@ export class ArtistsController {
       title: artistDto.title,
       image: artistDto.image ? artistDto.image : null,
       description: artistDto.description ? artistDto.description : null,
-      is_published: artistDto.is_published ? artistDto.is_published : false,
+      is_published: artistDto.is_published,
     });
 
     return artist.save();
   }
 
   @Delete(':id')
-  deleteOne(@Param('id') id: string) {
-    return this.artistModel.deleteOne({ _id: id });
+  async delete(@Param('id') id: string) {
+    await this.artistModel.deleteOne({ _id: id });
+    return { message: `Deleted artist with id: ${id}` };
   }
 }

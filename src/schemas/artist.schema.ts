@@ -14,7 +14,7 @@ export class Artist {
   @Prop()
   description: string;
 
-  @Prop()
+  @Prop({ default: false })
   is_published: boolean;
 }
 
