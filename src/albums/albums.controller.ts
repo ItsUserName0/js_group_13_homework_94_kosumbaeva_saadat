@@ -6,11 +6,14 @@ import {
   Param,
   Post,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Album, AlbumDocument } from '../schemas/album.schema';
 import { Model } from 'mongoose';
 import { CreateAlbumDto } from './create-album.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('albums')
 export class AlbumsController {
@@ -33,13 +36,21 @@ export class AlbumsController {
   }
 
   @Post()
-  create(@Body() albumDto: CreateAlbumDto) {
+  @UseInterceptors(
+    FileInterceptor('image', { dest: './public/uploads/albums' }),
+  )
+  create(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() albumData: CreateAlbumDto,
+  ) {
     const album = new this.albumModel({
-      title: albumDto.title,
-      artist: albumDto.artist,
-      release: albumDto.release ? albumDto.release : null,
-      is_published: albumDto.is_published,
+      title: albumData.title,
+      artist: albumData.artist,
+      release: albumData.release ? albumData.release : null,
+      is_published: albumData.is_published,
+      image: file ? '/uploads/albums/' + file.filename : null,
     });
+
     return album.save();
   }
 

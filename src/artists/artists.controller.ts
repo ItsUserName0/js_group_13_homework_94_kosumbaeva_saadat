@@ -1,8 +1,18 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Artist, ArtistDocument } from '../schemas/artist.schema';
 import { CreateArtistDto } from './create-artist.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('artists')
 export class ArtistsController {
@@ -22,12 +32,18 @@ export class ArtistsController {
   }
 
   @Post()
-  create(@Body() artistDto: CreateArtistDto) {
+  @UseInterceptors(
+    FileInterceptor('image', { dest: './public/uploads/artists' }),
+  )
+  create(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() artistData: CreateArtistDto,
+  ) {
     const artist = new this.artistModel({
-      title: artistDto.title,
-      image: artistDto.image ? artistDto.image : null,
-      description: artistDto.description ? artistDto.description : null,
-      is_published: artistDto.is_published,
+      title: artistData.title,
+      description: artistData.description ? artistData.description : null,
+      is_published: artistData.is_published,
+      image: file ? '/uploads/artists/' + file.filename : null,
     });
 
     return artist.save();

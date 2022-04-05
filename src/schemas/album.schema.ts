@@ -12,6 +12,9 @@ export class Album {
   artist: mongoose.Schema.Types.ObjectId;
 
   @Prop()
+  image: string;
+
+  @Prop()
   release: Date;
 
   @Prop({ default: false })
